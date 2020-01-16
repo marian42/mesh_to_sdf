@@ -46,12 +46,15 @@ class SurfacePointCloud:
             distances[inside] *= -1
             return distances
 
-    def get_sdf_in_batches(self, points, batch_size=100000):
-        result = np.zeros(points.shape[0])
-        for i in range(int(math.ceil(points.shape[0] / batch_size))):
+    def get_sdf_in_batches(self, query_points, use_depth_buffer=False, sample_count=11, batch_size=1e6):
+        if query_points.shape[0] <= batch_size:
+            return self.get_sdf(query_points, use_depth_buffer=use_depth_buffer, sample_count=sample_count)
+        
+        result = np.zeros(query_points.shape[0])
+        for i in range(int(math.ceil(query_points.shape[0] / batch_size))):
             start = i * batch_size
             end = min(result.shape[0], (i + 1) * batch_size)
-            result[start:end] = self.get_sdf(points[start:end, :])
+            result[start:end] = self.get_sdf(query_points[start:end, :], use_depth_buffer=use_depth_buffer, sample_count=sample_count)
         return result
 
     def get_voxel_sdf(self, voxel_resolution = 32):
