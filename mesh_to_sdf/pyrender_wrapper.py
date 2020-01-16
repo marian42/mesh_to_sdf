@@ -1,7 +1,13 @@
 ### Wrapper around the pyrender library that allows to
 ### 1. disable antialiasing
 ### 2. render a normal buffer
-### This needs to be imported before pyrender is imported anywhere
+### This needs to be imported before pyrender or OpenGL is imported anywhere
+
+import sys
+if 'pyrender' in sys.modules:
+    raise ImportError('The mesh_to_sdf package must be imported before pyrender is imported.')
+if 'OpenGL' in sys.modules:
+    raise ImportError('The mesh_to_sdf package must be imported before OpenGL is imported.')
 
 # Disable antialiasing:
 import OpenGL.GL
