@@ -138,10 +138,10 @@ def get_equidistant_camera_angles(count):
         phi = ((i + 1) * increment) % (2 * math.pi)
         yield phi, theta
 
-def create_from_scans(mesh, bounding_radius=1, scan_resolution=400, calculate_normals=True):
+def create_from_scans(mesh, bounding_radius=1, scan_count=100, scan_resolution=400, calculate_normals=True):
     scans = []
 
-    for phi, theta in get_equidistant_camera_angles(camera_count):
+    for phi, theta in get_equidistant_camera_angles(scan_count):
         scans.append(Scan(mesh,
             rotation_x=phi,
             rotation_y=theta,
