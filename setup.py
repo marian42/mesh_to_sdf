@@ -1,0 +1,21 @@
+import setuptools
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
+setuptools.setup(
+    name="mesh-to-sdf",
+    version="0.0.1",
+    author="Marian Kleineberg",
+    author_email="mail@marian42.de",
+    description="Calculate signed distance fields for arbitrary meshes",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/marian42/mesh_to_sdf",
+    packages=setuptools.find_packages(),
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent",
+    ],
+    python_requires='>=3.5',
+)
