@@ -10,10 +10,10 @@ import pyrender
 from util import get_voxel_coordinates
 
 class BadMeshException(Exception):
-    pass    
+    pass
 
-class MeshSDF:
-    def __init__(self, mesh, points, normals, scans=None):
+class SurfacePointCloud:
+    def __init__(self, mesh, points, normals=None, scans=None):
         self.mesh = mesh
         self.points = points
         self.normals = normals
@@ -147,7 +147,7 @@ def create_from_scans(mesh, bounding_radius=1, scan_resolution=400, calculate_no
             calculate_normals=calculate_normals
         ))
 
-    return MeshSDF(mesh, 
+    return SurfacePointCloud(mesh, 
         points=np.concatenate([scan.points for scan in self.scans], axis=0)
         normals=np.concatenate([scan.normals for scan in self.scans], axis=0) if calculate_normals else None,
         scans=scans
@@ -160,7 +160,7 @@ def sample_from_mesh(mesh, sample_point_count=10000000, calculate_normals=True):
     else:
         points = mesh.sample(sample_point_count, return_index=False)
 
-    return MeshSDF(mesh, 
+    return SurfacePointCloud(mesh, 
         points=points
         normals=normals if calculate_normals else None,
         scans=None
