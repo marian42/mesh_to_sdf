@@ -1,13 +1,16 @@
 import numpy as np
 import math
-from rendering.math import get_rotation_matrix
-from sdf.pyrender_wrapper import render_normal_and_depth_buffers
+from mesh_to_sdf.pyrender_wrapper import render_normal_and_depth_buffers
 from threading import Lock
 import pyrender
-import random
 
 CAMERA_DISTANCE = 2
 VIEWPORT_SIZE = 400
+
+def get_rotation_matrix(angle, axis='y'):
+    matrix = np.identity(4)
+    matrix[:3, :3] = Rotation.from_euler(axis, angle, degrees=True).as_dcm()
+    return matrix
 
 def get_camera_transform(rotation_y, rotation_x = 0):
     camera_transform = np.identity(4)

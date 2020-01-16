@@ -5,10 +5,9 @@ import numpy as np
 from sklearn.neighbors import KDTree
 import skimage
 import math
-from sdf.scan import create_scans
+from mesh_to_sdf.scan import create_scans
 import pyrender
 from util import get_voxel_coordinates
-import time
 
 class BadMeshException(Exception):
     pass
