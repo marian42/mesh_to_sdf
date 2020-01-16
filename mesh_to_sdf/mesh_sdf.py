@@ -10,40 +10,16 @@ import pyrender
 from util import get_voxel_coordinates
 
 class BadMeshException(Exception):
-    pass
-
-def scale_to_unit_sphere(mesh, rotation_matrix=None):
-    if isinstance(mesh, trimesh.Scene):
-        mesh = mesh.dump().sum()
-
-    origin = mesh.bounding_box.centroid
-    vertices = mesh.vertices - origin
-    distances = np.linalg.norm(vertices, axis=1)
-    size = np.max(distances)
-    vertices /= size
-
-    if rotation_matrix is not None:
-        vertices = np.matmul(rotation_matrix, vertices.transpose()).transpose()
-
-    return trimesh.Trimesh(vertices=vertices, faces=mesh.faces)
+    pass    
 
 class MeshSDF:
-    def __init__(self, mesh, use_scans=True):
-        if isinstance(mesh, trimesh.Scene):
-            mesh = mesh.dump().sum()
+    def __init__(self, mesh, points, normals, scans=None):
         self.mesh = mesh
-        
-        if use_scans:
-            self.scans = create_scans(mesh)
+        self.points = points
+        self.normals = normals
+        self.scans = scans
 
-            self.points = np.concatenate([scan.points for scan in self.scans], axis=0)
-            self.normals = np.concatenate([scan.normals for scan in self.scans], axis=0)
-        else:
-            points, indices = mesh.sample(10000000, return_index=True)
-            self.points = points
-            self.normals = mesh.face_normals[indices]
-
-        self.kd_tree = KDTree(self.points)
+        self.kd_tree = KDTree(points)
 
     def get_random_surface_points(self, count, use_scans=True):
         if use_scans:
@@ -151,3 +127,41 @@ class MeshSDF:
             else:
                 result = np.logical_or(result, scan.is_visible(points))
         return result
+
+def get_equidistant_camera_angles(count):
+    increment = math.pi * (3 - math.sqrt(5))
+    for i in range(count):
+        theta = math.asin(-1 + 2 * i / (count - 1))
+        phi = ((i + 1) * increment) % (2 * math.pi)
+        yield phi, theta
+
+def create_from_scans(mesh, bounding_radius=1, scan_resolution=400, calculate_normals=True):
+    scans = []
+
+    for phi, theta in get_equidistant_camera_angles(camera_count):
+        scans.append(Scan(mesh,
+            rotation_x=phi,
+            rotation_y=theta,
+            bounding_radius=bounding_radius,
+            resolution=scan_resolution,
+            calculate_normals=calculate_normals
+        ))
+
+    return MeshSDF(mesh, 
+        points=np.concatenate([scan.points for scan in self.scans], axis=0)
+        normals=np.concatenate([scan.normals for scan in self.scans], axis=0) if calculate_normals else None,
+        scans=scans
+    )
+
+def sample_from_mesh(mesh, sample_point_count=10000000, calculate_normals=True):
+    if calculate_normals:
+        points, face_indices = mesh.sample(sample_point_count, return_index=True)
+        normals = mesh.face_normals[face_indices]
+    else:
+        points = mesh.sample(sample_point_count, return_index=False)
+
+    return MeshSDF(mesh, 
+        points=points
+        normals=normals if calculate_normals else None,
+        scans=None
+    )
