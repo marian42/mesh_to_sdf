@@ -2,6 +2,7 @@ import numpy as np
 import math
 from mesh_to_sdf.pyrender_wrapper import render_normal_and_depth_buffers
 import pyrender
+from scipy.spatial.transform import Rotation
 
 def get_rotation_matrix(angle, axis='y'):
     matrix = np.identity(4)

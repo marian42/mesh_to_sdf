@@ -42,7 +42,7 @@ class CustomShaderCache():
 
     def get_program(self, vertex_shader, fragment_shader, geometry_shader=None, defines=None):
         if self.program is None:
-            self.program = pyrender.shader_program.ShaderProgram("sdf/shaders/mesh.vert", "sdf/shaders/mesh.frag", defines=defines)
+            self.program = pyrender.shader_program.ShaderProgram("mesh_to_sdf/shaders/mesh.vert", "mesh_to_sdf/shaders/mesh.frag", defines=defines)
         return self.program
 
 

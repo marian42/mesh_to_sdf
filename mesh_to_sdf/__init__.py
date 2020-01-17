@@ -1,5 +1,6 @@
 import numpy as np
-import surface_point_cloud
+import mesh_to_sdf.surface_point_cloud
+import trimesh
 
 
 def scale_to_unit_sphere(mesh):
@@ -46,7 +47,7 @@ def mesh_to_sdf(mesh, query_points, surface_point_method='scan', sign_method='no
 
     point_cloud = get_surface_point_cloud(mesh, surface_point_method, bounding_radius, scan_count, scan_resolution, sample_point_count, calculate_normals=sign_method=='normal')
 
-    if sign_method == 'normal:
+    if sign_method == 'normal':
         return point_cloud.get_sdf_in_batches(query_points, use_depth_buffer=False)
     elif sign_method == 'depth':
         return point_cloud.get_sdf_in_batches(query_points, use_depth_buffer=True, sample_count=sample_point_count)

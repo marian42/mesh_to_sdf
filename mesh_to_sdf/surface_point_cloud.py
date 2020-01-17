@@ -1,12 +1,12 @@
+from mesh_to_sdf.scan import Scan
+
 import trimesh
 import logging
 logging.getLogger("trimesh").setLevel(9000)
 import numpy as np
 from sklearn.neighbors import KDTree
 import math
-from mesh_to_sdf.scan import create_scans
 import pyrender
-from util import get_voxel_coordinates
 
 class BadMeshException(Exception):
     pass
@@ -151,8 +151,8 @@ def create_from_scans(mesh, bounding_radius=1, scan_count=100, scan_resolution=4
         ))
 
     return SurfacePointCloud(mesh, 
-        points=np.concatenate([scan.points for scan in self.scans], axis=0)
-        normals=np.concatenate([scan.normals for scan in self.scans], axis=0) if calculate_normals else None,
+        points=np.concatenate([scan.points for scan in scans], axis=0),
+        normals=np.concatenate([scan.normals for scan in scans], axis=0) if calculate_normals else None,
         scans=scans
     )
 
@@ -164,7 +164,7 @@ def sample_from_mesh(mesh, sample_point_count=10000000, calculate_normals=True):
         points = mesh.sample(sample_point_count, return_index=False)
 
     return SurfacePointCloud(mesh, 
-        points=points
+        points=points,
         normals=normals if calculate_normals else None,
         scans=None
     )
