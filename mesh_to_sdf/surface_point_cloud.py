@@ -3,7 +3,6 @@ import logging
 logging.getLogger("trimesh").setLevel(9000)
 import numpy as np
 from sklearn.neighbors import KDTree
-import skimage
 import math
 from mesh_to_sdf.scan import create_scans
 import pyrender
@@ -113,6 +112,7 @@ class SurfacePointCloud:
         pyrender.Viewer(scene, use_raymond_lighting=True, point_size=8)
 
     def show_reconstructed_mesh(self, voxel_resolution=64):
+        import skimage
         scene = pyrender.Scene()
         voxels = self.get_voxel_sdf(voxel_resolution=voxel_resolution)
         voxels = np.pad(voxels, 1, mode='constant', constant_values=1)
