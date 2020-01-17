@@ -39,3 +39,12 @@ def get_raster_points(voxel_resolution):
 
     voxel_points[voxel_resolution] = points
     return points
+
+def check_voxels(voxels):
+    block = voxels[:-1, :-1, :-1]
+    d1 = (block - voxels[1:, :-1, :-1]).reshape(-1)
+    d2 = (block - voxels[:-1, 1:, :-1]).reshape(-1)
+    d3 = (block - voxels[:-1, :-1, 1:]).reshape(-1)
+
+    max_distance = max(np.max(d1), np.max(d2), np.max(d3))
+    return max_distance < 2.0 / voxels.shape[0] * 3**0.5 * 1.1

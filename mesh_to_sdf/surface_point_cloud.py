@@ -8,9 +8,6 @@ from sklearn.neighbors import KDTree
 import math
 import pyrender
 
-class BadMeshException(Exception):
-    pass
-
 class SurfacePointCloud:
     def __init__(self, mesh, points, normals=None, scans=None):
         self.mesh = mesh
@@ -88,16 +85,6 @@ class SurfacePointCloud:
         indices = indices[:number_of_points]
         return np.concatenate([self.points[indices, :], self.normals[indices, :]], axis=1)
 
-    def check_voxels(self, voxels):
-        block = voxels[:-1, :-1, :-1]
-        d1 = (block - voxels[1:, :-1, :-1]).reshape(-1)
-        d2 = (block - voxels[:-1, 1:, :-1]).reshape(-1)
-        d3 = (block - voxels[:-1, :-1, 1:]).reshape(-1)
-
-        max_distance = max(np.max(d1), np.max(d2), np.max(d3))
-        if max_distance > 2.0 / voxels.shape[0] * 1.75: # The exact value is sqrt(3), the length of the diagonal of a cube
-            raise BadMeshException()
-    
     def show_pointcloud(self):
         scene = pyrender.Scene()
         scene.add(pyrender.Mesh.from_points(self.points, normals=self.normals))

@@ -1,7 +1,10 @@
 import numpy as np
 import mesh_to_sdf.surface_point_cloud
-from mesh_to_sdf.utils import scale_to_unit_cube, get_raster_points
+from mesh_to_sdf.utils import scale_to_unit_cube, get_raster_points, check_voxels
 import trimesh
+
+class BadMeshException(Exception):
+    pass
 
 def get_surface_point_cloud(mesh, surface_point_method='scan', bounding_radius=1, scan_count=100, scan_resolution=400, sample_point_count=10000000, calculate_normals=True):
     if isinstance(mesh, trimesh.Scene):
@@ -40,12 +43,15 @@ def mesh_to_sdf(mesh, query_points, surface_point_method='scan', sign_method='no
         raise ValueError('Unknown sign determination method: {:s}'.format(sign_method))
 
 
-def mesh_to_voxels(mesh, voxel_resolution=64, surface_point_method='scan', sign_method='normal', scan_count=100, scan_resolution=400, sample_point_count=10000000, normal_sample_count=11, pad=False):
+def mesh_to_voxels(mesh, voxel_resolution=64, surface_point_method='scan', sign_method='normal', scan_count=100, scan_resolution=400, sample_point_count=10000000, normal_sample_count=11, pad=False, check_result=False):
     mesh = scale_to_unit_cube(mesh)
 
     points = get_raster_points(voxel_resolution)    
     sdf = mesh_to_sdf(mesh, points, surface_point_method, sign_method, 3**0.5, scan_count, scan_resolution, sample_point_count, normal_sample_count)
     voxels = sdf.reshape((voxel_resolution, voxel_resolution, voxel_resolution))
+
+    if check_result and not check_voxels(voxels):
+        raise BadMeshException()
 
     if pad:
         voxels = np.pad(voxels, 1, mode='constant', constant_values=1)
