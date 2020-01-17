@@ -55,15 +55,7 @@ class SurfacePointCloud:
             end = min(result.shape[0], (i + 1) * batch_size)
             result[start:end] = self.get_sdf(query_points[start:end, :], use_depth_buffer=use_depth_buffer, sample_count=sample_count)
         return result
-
-    def get_voxel_sdf(self, voxel_resolution = 32):
-        center = self.mesh.bounding_box.centroid
-        size = np.max(self.mesh.bounding_box.extents) / 2
-        voxels = self.get_sdf(get_voxel_coordinates(voxel_resolution, size, center))
-        voxels = voxels.reshape(voxel_resolution, voxel_resolution, voxel_resolution)
-        self.check_voxels(voxels)
-        return voxels
-
+    
     def get_sample_points(self, number_of_points = 200000):
         ''' Use sample points as described in the DeepSDF paper '''
         points = []
