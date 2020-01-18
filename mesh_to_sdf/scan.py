@@ -86,7 +86,7 @@ class Scan():
         pixels = np.clip(pixels, 0, self.resolution - 1)
         return viewport_points[:, 2] < self.depth[pixels[:, 1], pixels[:, 0]]
 
-    def show_pointcloud(self):
+    def show(self):
         scene = pyrender.Scene()
-        scene.add(pyrender.Mesh.from_points(self.points * 100, normals=self.normals))
-        pyrender.Viewer(scene, use_raymond_lighting=True, point_size=8)
+        scene.add(pyrender.Mesh.from_points(self.points, normals=self.normals))
+        pyrender.Viewer(scene, use_raymond_lighting=True, point_size=2)
