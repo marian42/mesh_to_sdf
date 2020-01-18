@@ -6,11 +6,14 @@ import trimesh
 class BadMeshException(Exception):
     pass
 
-def get_surface_point_cloud(mesh, surface_point_method='scan', bounding_radius=1, scan_count=100, scan_resolution=400, sample_point_count=10000000, calculate_normals=True):
+def get_surface_point_cloud(mesh, surface_point_method='scan', bounding_radius=None, scan_count=100, scan_resolution=400, sample_point_count=10000000, calculate_normals=True):
     if isinstance(mesh, trimesh.Scene):
         mesh = mesh.dump().sum()
     if not isinstance(mesh, trimesh.Trimesh):
         raise TypeError("The mesh parameter must be a trimesh mesh.")
+
+    if bounding_radius is None:
+        bounding_radius = np.max(np.linalg.norm(mesh.vertices, axis=1)) * 1.1
         
     if surface_point_method == 'scan':
         return surface_point_cloud.create_from_scans(mesh, bounding_radius=bounding_radius, scan_count=scan_count, scan_resolution=scan_resolution, calculate_normals=calculate_normals)
@@ -25,9 +28,6 @@ def mesh_to_sdf(mesh, query_points, surface_point_method='scan', sign_method='no
         raise TypeError('query_points must be a numpy array.')
     if len(query_points.shape) != 2 or query_points.shape[1] != 3:
         raise ValueError('query_points must be of shape N ✕ 3.')
-
-    if bounding_radius is None:
-        bounding_radius = np.max(np.linalg.norm(mesh.vertices, axis=1)) * 1.1
     
     if surface_point_method == 'sample' and sign_method == 'depth':
         print("Incompatible methods for sampling points and determining sign, using sign_method='normal' instead.")
