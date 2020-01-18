@@ -128,7 +128,7 @@ This can be used to detect bad meshes.
 
 Returns
 - `points`: an N ✕ 3 numpy array containing the sample points
-- `sdf` a numpy array of size N with the corresponding SDF values
+- `sdf`: a numpy array of size N with the corresponding SDF values
 
 ## get_surface_point_cloud
 
