@@ -24,7 +24,7 @@ vertices, faces, normals, _ = skimage.measure.marching_cubes_lewiner(voxels, lev
 mesh = trimesh.Trimesh(vertices=vertices, faces=faces, vertex_normals=normals)
 mesh.show()
 ```
-![Example of a mesh and a reconstructed SDF voxel volume](example/voxel.png)
+![Example of a mesh and a reconstructed SDF voxel volume](https://raw.githubusercontent.com/marian42/mesh_to_sdf/master/example/voxel.png)
 
 ### Sample SDF points non-uniformly near the surface
 
@@ -52,7 +52,7 @@ scene.add(cloud)
 viewer = pyrender.Viewer(scene, use_raymond_lighting=True, point_size=2)
 ```
 
-![Example of a mesh and a point cloud of non-uniformly sampled SDF points](example/non-uniform.png)
+![Example of a mesh and a point cloud of non-uniformly sampled SDF points](https://raw.githubusercontent.com/marian42/mesh_to_sdf/master/example/non-uniform.png)
 
 ## How it works
 
