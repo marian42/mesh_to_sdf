@@ -117,7 +117,7 @@ This follows the procedure proposed in the [DeepSDF paper](https://arxiv.org/abs
 The mesh is first transformed to fit inside the unit sphere.
 
 ```python
-sample_sdf_near_surface(mesh, number_of_points = 500000, surface_point_method='scan', sign_method='normal', scan_count=100, scan_resolution=400, sample_point_count=10000000, normal_sample_count=11, min_size=0)
+mesh_to_sdf.sample_sdf_near_surface(mesh, number_of_points = 500000, surface_point_method='scan', sign_method='normal', scan_count=100, scan_resolution=400, sample_point_count=10000000, normal_sample_count=11, min_size=0)
 ```
 
 Parameters
@@ -138,7 +138,7 @@ Returns an intermediate data structure containing a surface point cloud, scans a
 This can be used if SDFs will be calculated multiple times for the same mesh or for debugging.
 
 ```python
-get_surface_point_cloud(mesh, surface_point_method='scan', bounding_radius=1, scan_count=100, scan_resolution=400, sample_point_count=10000000, calculate_normals=True)
+mesh_to_sdf.get_surface_point_cloud(mesh, surface_point_method='scan', bounding_radius=1, scan_count=100, scan_resolution=400, sample_point_count=10000000, calculate_normals=True)
 ```
 
 Parameters
