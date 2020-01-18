@@ -1,2 +1,5 @@
 mesh_to_sdf.egg-info/
 **/__pycache__/**
+
+build/**
+dist/**
