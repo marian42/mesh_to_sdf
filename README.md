@@ -16,13 +16,11 @@ from mesh_to_sdf import mesh_to_voxels
 import trimesh
 import skimage
 
-VOXEL_RESOLUTION = 64
-
 mesh = trimesh.load('chair.obj')
 
-voxels = mesh_to_voxels(mesh, VOXEL_RESOLUTION, pad=True)
+voxels = mesh_to_voxels(mesh, 64, pad=True)
 
-vertices, faces, normals, _ = skimage.measure.marching_cubes_lewiner(voxels, level=0, spacing=(2 / VOXEL_RESOLUTION, 2 / VOXEL_RESOLUTION, 2 / VOXEL_RESOLUTION))
+vertices, faces, normals, _ = skimage.measure.marching_cubes_lewiner(voxels, level=0)
 mesh = trimesh.Trimesh(vertices=vertices, faces=faces, vertex_normals=normals)
 mesh.show()
 ```
