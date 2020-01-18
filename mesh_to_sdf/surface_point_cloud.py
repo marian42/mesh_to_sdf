@@ -52,29 +52,6 @@ class SurfacePointCloud:
             end = min(result.shape[0], (i + 1) * batch_size)
             result[start:end] = self.get_sdf(query_points[start:end, :], use_depth_buffer=use_depth_buffer, sample_count=sample_count)
         return result
-    
-    def get_sample_points(self, number_of_points = 200000):
-        ''' Use sample points as described in the DeepSDF paper '''
-        points = []
-
-        surface_sample_count = int(number_of_points * 0.4)
-        surface_points = self.get_random_surface_points(surface_sample_count)
-        points.append(surface_points + np.random.normal(scale=0.0025, size=(surface_sample_count, 3)))
-        points.append(surface_points + np.random.normal(scale=0.00025, size=(surface_sample_count, 3)))
-
-        unit_sphere_sample_count = int(number_of_points * 0.2)
-        unit_sphere_points = np.random.uniform(-1, 1, size=(unit_sphere_sample_count * 2, 3))
-        unit_sphere_points = unit_sphere_points[np.linalg.norm(unit_sphere_points, axis=1) < 1]
-        points.append(unit_sphere_points[:unit_sphere_sample_count, :])
-        points = np.concatenate(points).astype(np.float32)
-
-        sdf = self.get_sdf(points)
-        
-        model_size = np.count_nonzero(sdf[-unit_sphere_sample_count:] < 0) / unit_sphere_sample_count
-        if model_size < 0.015:
-            raise BadMeshException()
-
-        return points, sdf
 
     def get_surface_points_and_normals(self, number_of_points = 50000):
         count = self.points.shape[0]
