@@ -53,30 +53,10 @@ class SurfacePointCloud:
             result[start:end] = self.get_sdf(query_points[start:end, :], use_depth_buffer=use_depth_buffer, sample_count=sample_count)
         return result
 
-    def get_surface_points_and_normals(self, number_of_points = 50000):
-        count = self.points.shape[0]
-        if count < number_of_points:
-            print("Warning: Less than {:d} points sampled.".format(number_of_points))
-        indices = np.arange(count)
-        np.random.shuffle(indices)
-        indices = indices[:number_of_points]
-        return np.concatenate([self.points[indices, :], self.normals[indices, :]], axis=1)
-
-    def show_pointcloud(self):
+    def show(self):
         scene = pyrender.Scene()
         scene.add(pyrender.Mesh.from_points(self.points, normals=self.normals))
-        pyrender.Viewer(scene, use_raymond_lighting=True, point_size=8)
-
-    def show_reconstructed_mesh(self, voxel_resolution=64):
-        import skimage
-        scene = pyrender.Scene()
-        voxels = self.get_voxel_sdf(voxel_resolution=voxel_resolution)
-        voxels = np.pad(voxels, 1, mode='constant', constant_values=1)
-        vertices, faces, normals, _ = skimage.measure.marching_cubes_lewiner(voxels, level=0, spacing=(voxel_resolution, voxel_resolution, voxel_resolution))
-        reconstructed = trimesh.Trimesh(vertices=vertices, faces=faces, vertex_normals=normals)
-        reconstructed_pyrender = pyrender.Mesh.from_trimesh(reconstructed, smooth=False)
-        scene.add(reconstructed_pyrender)
-        pyrender.Viewer(scene, use_raymond_lighting=True)
+        pyrender.Viewer(scene, use_raymond_lighting=True, point_size=2)
         
     def is_outside(self, points):
         result = None
