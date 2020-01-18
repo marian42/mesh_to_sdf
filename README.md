@@ -3,6 +3,12 @@
 This project calculates approximate SDFs for triangle meshes.
 It works for **non-watertight** meshes (meshes with holes), **self-intersecting** meshes, meshes with **non-manifold geometry** and meshes with **inconsistently oriented faces**.
 
+## Install
+
+```
+pip3 install mesh-to-sdf
+```
+
 ## Examples
 
 ### Voxelize a mesh
