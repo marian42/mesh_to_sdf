@@ -32,7 +32,7 @@ class Scan():
         z_near = camera_distance - bounding_radius
         z_far = camera_distance + bounding_radius
         
-        camera = pyrender.PerspectiveCamera(yfov=2 * math.asin(1.0 / camera_distance), aspectRatio=1.0, znear = z_near, zfar = z_far)
+        camera = pyrender.PerspectiveCamera(yfov=2 * math.asin(bounding_radius / camera_distance), aspectRatio=1.0, znear = z_near, zfar = z_far)
         self.projection_matrix = camera.get_projection_matrix()
 
         color, depth = render_normal_and_depth_buffers(mesh, camera, self.camera_transform, resolution)
