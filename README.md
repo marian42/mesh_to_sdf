@@ -88,7 +88,7 @@ mesh_to_sdf.mesh_to_sdf(mesh, query_points, surface_point_method='scan', sign_me
 
 Parameters
 - `mesh`: a [trimesh](https://trimsh.org/trimesh.html) mesh
-- `query_points`: a N ✕ 3 numpy array, containing the points for which the signed distance function should be calculated.
+- `query_points`: an N ✕ 3 numpy array, containing the points for which the signed distance function should be calculated.
 - See *common parameters* for the remaining parameters
 
 Returns

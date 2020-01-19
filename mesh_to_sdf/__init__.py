@@ -46,17 +46,9 @@ def mesh_to_sdf(mesh, query_points, surface_point_method='scan', sign_method='no
 def mesh_to_voxels(mesh, voxel_resolution=64, surface_point_method='scan', sign_method='normal', scan_count=100, scan_resolution=400, sample_point_count=10000000, normal_sample_count=11, pad=False, check_result=False):
     mesh = scale_to_unit_cube(mesh)
 
-    points = get_raster_points(voxel_resolution)    
-    sdf = mesh_to_sdf(mesh, points, surface_point_method, sign_method, 3**0.5, scan_count, scan_resolution, sample_point_count, normal_sample_count)
-    voxels = sdf.reshape((voxel_resolution, voxel_resolution, voxel_resolution))
+    surface_point_cloud = get_surface_point_cloud(mesh, surface_point_method, 3**0.5, scan_count, scan_resolution, sample_point_count, sign_method=='normal')
 
-    if check_result and not check_voxels(voxels):
-        raise BadMeshException()
-
-    if pad:
-        voxels = np.pad(voxels, 1, mode='constant', constant_values=1)
-
-    return voxels
+    return surface_point_cloud.get_voxels(voxel_resolution, sign_method=='depth', normal_sample_count, pad, check_result)
 
 # Sample some uniform points and some normally distributed around the surface as proposed in the DeepSDF paper
 def sample_sdf_near_surface(mesh, number_of_points = 500000, surface_point_method='scan', sign_method='normal', scan_count=100, scan_resolution=400, sample_point_count=10000000, normal_sample_count=11, min_size=0):

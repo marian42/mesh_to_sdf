@@ -53,6 +53,21 @@ class SurfacePointCloud:
             result[start:end] = self.get_sdf(query_points[start:end, :], use_depth_buffer=use_depth_buffer, sample_count=sample_count)
         return result
 
+    def get_voxels(self, voxel_resolution, use_depth_buffer=False, sample_count=11, pad=False, check_result=False):
+        from mesh_to_sdf import BadMeshException
+        from mesh_to_sdf.utils import get_raster_points, check_voxels
+        
+        sdf = self.get_sdf_in_batches(get_raster_points(voxel_resolution), use_depth_buffer, sample_count)
+        voxels = sdf.reshape((voxel_resolution, voxel_resolution, voxel_resolution))
+
+        if check_result and not check_voxels(voxels):
+            raise BadMeshException()
+
+        if pad:
+            voxels = np.pad(voxels, 1, mode='constant', constant_values=1)
+
+        return voxels
+
     def show(self):
         scene = pyrender.Scene()
         scene.add(pyrender.Mesh.from_points(self.points, normals=self.normals))
