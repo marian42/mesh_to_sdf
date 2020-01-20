@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mesh-to-sdf",
-    version="0.0.3",
+    version="0.0.4",
     author="Marian Kleineberg",
     author_email="mail@marian42.de",
     description="Calculate signed distance fields for arbitrary meshes",
@@ -19,4 +19,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.5',
+    data_files=[('shaders', ['mesh_to_sdf/shaders/mesh.frag', 'mesh_to_sdf/shaders/mesh.vert'])],
+    include_package_data = True
 )
