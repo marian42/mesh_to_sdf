@@ -1,5 +1,6 @@
 import numpy as np
 import mesh_to_sdf.surface_point_cloud
+from mesh_to_sdf.surface_point_cloud import BadMeshException
 from mesh_to_sdf.utils import scale_to_unit_cube, scale_to_unit_sphere, get_raster_points, check_voxels
 import trimesh
 
