@@ -8,6 +8,9 @@ from sklearn.neighbors import KDTree
 import math
 import pyrender
 
+class BadMeshException(Exception):
+    pass
+
 class SurfacePointCloud:
     def __init__(self, mesh, points, normals=None, scans=None):
         self.mesh = mesh
@@ -54,7 +57,6 @@ class SurfacePointCloud:
         return result
 
     def get_voxels(self, voxel_resolution, use_depth_buffer=False, sample_count=11, pad=False, check_result=False):
-        from mesh_to_sdf import BadMeshException
         from mesh_to_sdf.utils import get_raster_points, check_voxels
         
         sdf = self.get_sdf_in_batches(get_raster_points(voxel_resolution), use_depth_buffer, sample_count)
@@ -67,6 +69,33 @@ class SurfacePointCloud:
             voxels = np.pad(voxels, 1, mode='constant', constant_values=1)
 
         return voxels
+
+    def sample_sdf_near_surface(self, number_of_points=500000, use_scans=True, sign_method='normal', normal_sample_count=11, min_size=0):
+        query_points = []
+        surface_sample_count = int(number_of_points * 47 / 50) // 2
+        surface_points = self.get_random_surface_points(surface_sample_count, use_scans=use_scans)
+        query_points.append(surface_points + np.random.normal(scale=0.0025, size=(surface_sample_count, 3)))
+        query_points.append(surface_points + np.random.normal(scale=0.00025, size=(surface_sample_count, 3)))
+
+        unit_sphere_sample_count = number_of_points - surface_sample_count
+        unit_sphere_points = np.random.uniform(-1, 1, size=(unit_sphere_sample_count * 2, 3))
+        unit_sphere_points = unit_sphere_points[np.linalg.norm(unit_sphere_points, axis=1) < 1]
+        query_points.append(unit_sphere_points[:unit_sphere_sample_count, :])
+        query_points = np.concatenate(query_points).astype(np.float32)
+
+        if sign_method == 'normal':
+            sdf = self.get_sdf_in_batches(query_points, use_depth_buffer=False, sample_count=normal_sample_count)
+        elif sign_method == 'depth':
+            sdf = surface_point_cloud.get_sdf_in_batches(query_points, use_depth_buffer=True)
+        else:
+            raise ValueError('Unknown sign determination method: {:s}'.format(sign_method))
+        
+        if min_size > 0:
+            model_size = np.count_nonzero(sdf[-unit_sphere_sample_count:] < 0) / unit_sphere_sample_count
+            if model_size < min_size:
+                raise BadMeshException()
+
+        return query_points, sdf
 
     def show(self):
         scene = pyrender.Scene()
