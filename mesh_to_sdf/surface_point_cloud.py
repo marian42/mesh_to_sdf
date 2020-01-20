@@ -45,7 +45,7 @@ class SurfacePointCloud:
             distances[inside] *= -1
             return distances
 
-    def get_sdf_in_batches(self, query_points, use_depth_buffer=False, sample_count=11, batch_size=1e6):
+    def get_sdf_in_batches(self, query_points, use_depth_buffer=False, sample_count=11, batch_size=1000000):
         if query_points.shape[0] <= batch_size:
             return self.get_sdf(query_points, use_depth_buffer=use_depth_buffer, sample_count=sample_count)
         
