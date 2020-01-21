@@ -51,8 +51,8 @@ class SurfacePointCloud:
         
         result = np.zeros(query_points.shape[0])
         for i in range(int(math.ceil(query_points.shape[0] / batch_size))):
-            start = i * batch_size
-            end = min(result.shape[0], (i + 1) * batch_size)
+            start = int(i * batch_size)
+            end = int(min(result.shape[0], (i + 1) * batch_size))
             result[start:end] = self.get_sdf(query_points[start:end, :], use_depth_buffer=use_depth_buffer, sample_count=sample_count)
         return result
 
