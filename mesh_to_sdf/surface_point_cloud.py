@@ -86,7 +86,7 @@ class SurfacePointCloud:
         if sign_method == 'normal':
             sdf = self.get_sdf_in_batches(query_points, use_depth_buffer=False, sample_count=normal_sample_count)
         elif sign_method == 'depth':
-            sdf = surface_point_cloud.get_sdf_in_batches(query_points, use_depth_buffer=True)
+            sdf = self.get_sdf_in_batches(query_points, use_depth_buffer=True)
         else:
             raise ValueError('Unknown sign determination method: {:s}'.format(sign_method))
         
