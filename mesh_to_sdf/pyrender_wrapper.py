@@ -58,6 +58,6 @@ def render_normal_and_depth_buffers(mesh, camera, camera_transform, resolution):
     renderer = pyrender.OffscreenRenderer(resolution, resolution)
     renderer._renderer._program_cache = CustomShaderCache()
 
-    color, depth = renderer.render(scene)
+    color, depth = renderer.render(scene, flags=pyrender.RenderFlags.SKIP_CULL_FACES)
     suppress_multisampling = False
     return color, depth
