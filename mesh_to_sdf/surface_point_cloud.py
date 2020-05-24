@@ -7,6 +7,7 @@ import numpy as np
 from sklearn.neighbors import KDTree
 import math
 import pyrender
+from mesh_to_sdf.utils import sample_uniform_points_in_unit_sphere
 
 class BadMeshException(Exception):
     pass
@@ -76,11 +77,9 @@ class SurfacePointCloud:
         surface_points = self.get_random_surface_points(surface_sample_count, use_scans=use_scans)
         query_points.append(surface_points + np.random.normal(scale=0.0025, size=(surface_sample_count, 3)))
         query_points.append(surface_points + np.random.normal(scale=0.00025, size=(surface_sample_count, 3)))
-
-        unit_sphere_sample_count = number_of_points - surface_sample_count * 2
-        unit_sphere_points = np.random.uniform(-1, 1, size=(unit_sphere_sample_count * 2, 3))
-        unit_sphere_points = unit_sphere_points[np.linalg.norm(unit_sphere_points, axis=1) < 1]
-        query_points.append(unit_sphere_points[:unit_sphere_sample_count, :])
+        
+        unit_sphere_points = sample_uniform_points_in_unit_sphere(number_of_points - surface_points.shape[0] * 2)
+        query_points.append(unit_sphere_points)
         query_points = np.concatenate(query_points).astype(np.float32)
 
         if sign_method == 'normal':
