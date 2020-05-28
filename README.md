@@ -14,7 +14,7 @@ pip3 install mesh-to-sdf
 ### Voxelize a mesh
 
 The `mesh_to_voxels` function creates an N ✕ N ✕ N array of SDF values.
-In this example, a mesh reconstructed using Marching Cubes and then rendered.
+In this example, a mesh is reconstructed using Marching Cubes and then rendered.
 
 ```python
 from mesh_to_sdf import mesh_to_voxels
