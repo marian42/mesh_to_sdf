@@ -3,6 +3,7 @@ import math
 from mesh_to_sdf.pyrender_wrapper import render_normal_and_depth_buffers
 import pyrender
 from scipy.spatial.transform import Rotation
+from skimage import io
 
 def get_rotation_matrix(angle, axis='y'):
     matrix = np.identity(4)
@@ -36,6 +37,9 @@ class Scan():
         self.projection_matrix = camera.get_projection_matrix()
 
         color, depth = render_normal_and_depth_buffers(mesh, camera, self.camera_transform, resolution)
+
+        self.normal_buffer = color if calculate_normals else None
+        self.depth_buffer = depth.copy()
         
         indices = np.argwhere(depth != 0)
         depth[depth == 0] = float('inf')
@@ -90,3 +94,14 @@ class Scan():
         scene = pyrender.Scene()
         scene.add(pyrender.Mesh.from_points(self.points, normals=self.normals))
         pyrender.Viewer(scene, use_raymond_lighting=True, point_size=2)
+
+    def save(self, filename_depth, filename_normals=None):
+        if filename_normals is None and self.normal_buffer is not None:
+            items = filename_depth.split('.')
+            filename_normals = '.'.join(items[:-1]) + "_normals." + items[-1]
+        
+        depth = self.depth_buffer / np.max(self.depth_buffer) * 255
+
+        io.imsave(filename_depth, depth.astype(np.uint8))
+        if self.normal_buffer is not None:
+            io.imsave(filename_normals, self.normal_buffer.astype(np.uint8))
