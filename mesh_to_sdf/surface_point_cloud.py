@@ -1,4 +1,4 @@
-from mesh_to_sdf.scan import Scan
+from mesh_to_sdf.scan import Scan, get_camera_transform_looking_at_origin
 
 import trimesh
 import logging
@@ -121,12 +121,14 @@ def create_from_scans(mesh, bounding_radius=1, scan_count=100, scan_resolution=4
     scans = []
 
     for phi, theta in get_equidistant_camera_angles(scan_count):
+        camera_transform = get_camera_transform_looking_at_origin(phi, theta, camera_distance=2 * bounding_radius)
         scans.append(Scan(mesh,
-            rotation_x=phi,
-            rotation_y=theta,
-            bounding_radius=bounding_radius,
+            camera_transform=camera_transform,
             resolution=scan_resolution,
-            calculate_normals=calculate_normals
+            calculate_normals=calculate_normals,
+            fov=1.0472,
+            z_near=bounding_radius * 1,
+            z_far=bounding_radius * 3
         ))
 
     return SurfacePointCloud(mesh, 

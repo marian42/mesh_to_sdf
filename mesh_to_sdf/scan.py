@@ -10,7 +10,7 @@ def get_rotation_matrix(angle, axis='y'):
     matrix[:3, :3] = Rotation.from_euler(axis, angle).as_dcm()
     return matrix
 
-def get_camera_transform(rotation_y, rotation_x, camera_distance=2):
+def get_camera_transform_looking_at_origin(rotation_y, rotation_x, camera_distance=2):
     camera_transform = np.identity(4)
     camera_transform[2, 3] = camera_distance
     camera_transform = np.matmul(get_rotation_matrix(rotation_x, axis='x'), camera_transform)
@@ -23,17 +23,12 @@ This renders a normal and depth buffer and reprojects it into a point cloud.
 The resulting point cloud contains a point for every pixel in the buffer that hit the model.
 '''
 class Scan():
-    def __init__(self, mesh, rotation_y, rotation_x, bounding_radius=1, resolution=400, calculate_normals=True):
-        camera_distance = 2 * bounding_radius
-        self.camera_transform = get_camera_transform(rotation_y, rotation_x, camera_distance=camera_distance)
-        self.camera_direction = np.matmul(self.camera_transform, np.array([0, 0, 1, 0]))[:3]
+    def __init__(self, mesh, camera_transform, resolution=400, calculate_normals=True, fov=1, z_near=0.1, z_far=10):
+        self.camera_transform = camera_transform
         self.camera_position = np.matmul(self.camera_transform, np.array([0, 0, 0, 1]))[:3]
         self.resolution = resolution
         
-        z_near = camera_distance - bounding_radius
-        z_far = camera_distance + bounding_radius
-        
-        camera = pyrender.PerspectiveCamera(yfov=2 * math.asin(bounding_radius / camera_distance), aspectRatio=1.0, znear = z_near, zfar = z_far)
+        camera = pyrender.PerspectiveCamera(yfov=fov, aspectRatio=1.0, znear = z_near, zfar = z_far)
         self.projection_matrix = camera.get_projection_matrix()
 
         color, depth = render_normal_and_depth_buffers(mesh, camera, self.camera_transform, resolution)
