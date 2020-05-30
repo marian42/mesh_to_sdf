@@ -17,6 +17,24 @@ def get_camera_transform_looking_at_origin(rotation_y, rotation_x, camera_distan
     camera_transform = np.matmul(get_rotation_matrix(rotation_y, axis='y'), camera_transform)
     return camera_transform
 
+# Camera transform from position and look direction
+def get_camera_transform(position, look_direction):
+    camera_forward = -look_direction / np.linalg.norm(look_direction)
+    camera_right = np.cross(camera_forward, np.array((0, 0, -1)))
+    if np.linalg.norm(camera_right) < 0.5:
+        camera_right = np.array((0, 1, 0))
+    camera_up = np.cross(camera_forward, camera_right)
+
+    rotation = np.identity(4)
+    rotation[:3, 0] = camera_right
+    rotation[:3, 1] = camera_up
+    rotation[:3, 2] = camera_forward
+
+    translation = np.identity(4)
+    translation[:3, 3] = position
+
+    return np.matmul(translation, rotation)
+
 '''
 A virtual laser scan of an object from one point in space.
 This renders a normal and depth buffer and reprojects it into a point cloud.
