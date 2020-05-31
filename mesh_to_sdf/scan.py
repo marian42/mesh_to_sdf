@@ -45,7 +45,6 @@ class Scan():
         self.camera_transform = camera_transform
         self.camera_position = np.matmul(self.camera_transform, np.array([0, 0, 0, 1]))[:3]
         self.resolution = resolution
-        self.z_near = z_near
         
         camera = pyrender.PerspectiveCamera(yfov=fov, aspectRatio=1.0, znear = z_near, zfar = z_far)
         self.projection_matrix = camera.get_projection_matrix()
@@ -103,7 +102,7 @@ class Scan():
         pixels = viewport_points[:, :2].astype(int)
 
         # This only has an effect if the camera is inside the model
-        in_viewport = (pixels[:, 0] >= 0) & (pixels[:, 1] >= 0) & (pixels[:, 0] < self.resolution) & (pixels[:, 1] < self.resolution) & (viewport_points[:, 2] > self.z_near)
+        in_viewport = (pixels[:, 0] >= 0) & (pixels[:, 1] >= 0) & (pixels[:, 0] < self.resolution) & (pixels[:, 1] < self.resolution) & (viewport_points[:, 2] > -1)
 
         result = np.zeros(points.shape[0], dtype=bool)
         result[in_viewport] = viewport_points[in_viewport, 2] < self.depth[pixels[in_viewport, 1], pixels[in_viewport, 0]]
