@@ -76,6 +76,50 @@ The sign of the point is positive if it is seen by any of the cameras.
 
 This repository contains an implementation of the procedure proposed in the [DeepSDF paper](), as well as some alternatives.
 
+## FAQ
+
+__Q: I'm getting this error: `module 'pyglet.gl' has no attribute 'xlib'`__
+
+This is a bug with some versions of pyrender and a workaround is to install `pyrender 0.1.30` and `pyglet 1.4.0b1`.
+Check [this issue](https://github.com/marian42/mesh_to_sdf/issues/8#issuecomment-635024214) for more details.
+
+__Q: I want to run this on a computer without a screen (ie. via SSH)__
+
+Add this to your script before importing `mesh_to_sdf`:
+
+    import os
+    os.environ['PYOPENGL_PLATFORM'] = 'egl'
+
+__Q: There are cone shaped artifacts in the SDF volume when using `sign_method='normal'`__
+
+This is a known issue.
+To mitigate this, the signs are determined by checking a number of surface points and using a majority vote.
+This problem can't be avoided entirely and increasing the number of points (`normal_sample_count`) even further doesn't seem to help.
+In some cases, this problem appears when the mesh contains tiny triangles that face in a different direction than their surrounding area.
+Smoothing the mesh doesn't seem to help.
+
+The `sign_method='depth'` approach doesn't have this problem.
+But it doesn't work with meshes that have holes.
+
+__Q: There are ray shaped artifacts in the SDF volume when using `sign_method='depth'`__
+
+This happens when the mesh has holes and a camera can see "inside" the mesh.
+Use `sign_method='normal'` instead.
+
+
+__Q: This doesn't work!__
+
+This repository contains two approximate methods and in some cases they don't provide usable results.
+When one of the methods fails, try the other one.
+This can be automated by using the built-in ways to check if the result is plausible.
+For the voxelizing methods, use `check_result=True`.
+This checks if the difference in SDF is smaller than the difference in distance between any two points.
+In `sample_sdf_near_surface`, you can add a volume check (`min_size`).
+If these checks fail, a `BadMeshException` is thrown.
+
+This repository can process about 60% of the meshes in the [ShapeNet](https://www.shapenet.org/) dataset.
+
+
 # Documentation
 
 ## mesh_to_sdf
