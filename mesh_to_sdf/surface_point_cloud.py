@@ -78,7 +78,8 @@ class SurfacePointCloud:
         query_points.append(surface_points + np.random.normal(scale=0.0025, size=(surface_sample_count, 3)))
         query_points.append(surface_points + np.random.normal(scale=0.00025, size=(surface_sample_count, 3)))
         
-        unit_sphere_points = sample_uniform_points_in_unit_sphere(number_of_points - surface_points.shape[0] * 2)
+        unit_sphere_sample_count = number_of_points - surface_points.shape[0] * 2
+        unit_sphere_points = sample_uniform_points_in_unit_sphere(unit_sphere_sample_count)
         query_points.append(unit_sphere_points)
         query_points = np.concatenate(query_points).astype(np.float32)
 
