@@ -86,7 +86,7 @@ __Q: I'm getting this error: `module 'pyglet.gl' has no attribute 'xlib'`__
 This is due to a [bug](https://github.com/mmatl/pyrender/issues/117) in pyrender.
 Possible workarounds:
 - use `pyrender 0.1.30` and `pyglet 1.4.0b1` (check [this issue](https://github.com/marian42/mesh_to_sdf/issues/8#issuecomment-635024214) for more details)
-- install pyrender from source and apply [this patch](https://github.com/mmatl/pyrender/pull/124/files)
+- manually edit `site-packages/pyrender/platforms/pyglet_platfform.py` and surround the content of `make_uncurrent` with a try-catch block
 - use Linux instead of Windows or Mac. This problem appears because pyrender tries to use a library that is only available on Linux.
 
 __Q: I want to run this on a computer without a screen (ie. via SSH)__
