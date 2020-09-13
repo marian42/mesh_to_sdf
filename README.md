@@ -9,6 +9,9 @@ It works for **non-watertight** meshes (meshes with holes), **self-intersecting*
 pip3 install mesh-to-sdf
 ```
 
+If you're using Windows or Mac, you need to work around a bug in pyrender.
+Check the FAQs below.
+
 ## Examples
 
 ### Voxelize a mesh
@@ -80,8 +83,11 @@ This repository contains an implementation of the procedure proposed in the [Dee
 
 __Q: I'm getting this error: `module 'pyglet.gl' has no attribute 'xlib'`__
 
-This is a bug with some versions of pyrender and a workaround is to install `pyrender 0.1.30` and `pyglet 1.4.0b1`.
-Check [this issue](https://github.com/marian42/mesh_to_sdf/issues/8#issuecomment-635024214) for more details.
+This is due to a [bug](https://github.com/mmatl/pyrender/issues/117) in pyrender.
+Possible workarounds:
+- use `pyrender 0.1.30` and `pyglet 1.4.0b1` (check [this issue](https://github.com/marian42/mesh_to_sdf/issues/8#issuecomment-635024214) for more details)
+- install pyrender from source and apply [this patch](https://github.com/mmatl/pyrender/pull/124/files)
+- use Linux instead of Windows or Mac. This problem appears because pyrender tries to use a library that is only available on Linux.
 
 __Q: I want to run this on a computer without a screen (ie. via SSH)__
 
