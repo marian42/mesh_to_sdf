@@ -77,7 +77,7 @@ When using the depth buffer method, the point is projected in the frame of each 
 By comparing the depth element of the depth buffer and depth of the query point, we determine if the query point is seen by the camera.
 The sign of the point is positive if it is seen by any of the cameras.
 
-This repository contains an implementation of the procedure proposed in the [DeepSDF paper](), as well as some alternatives.
+This repository contains an implementation of the procedure proposed in the [DeepSDF paper](https://arxiv.org/abs/1901.05103), as well as some alternatives.
 
 ## FAQ
 
