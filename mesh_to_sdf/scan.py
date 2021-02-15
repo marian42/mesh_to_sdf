@@ -1,14 +1,19 @@
 import numpy as np
-import math
 from mesh_to_sdf.pyrender_wrapper import render_normal_and_depth_buffers
 import pyrender
 from scipy.spatial.transform import Rotation
 from skimage import io
 
-def get_rotation_matrix(angle, axis='y'):
-    matrix = np.identity(4)
-    matrix[:3, :3] = Rotation.from_euler(axis, angle).as_dcm()
-    return matrix
+if hasattr(Rotation, "as_matrix"): # scipy>=1.4.0
+    def get_rotation_matrix(angle, axis='y'):
+        matrix = np.identity(4)
+        matrix[:3, :3] = Rotation.from_euler(axis, angle).as_matrix()
+        return matrix
+else: # scipy<1.4.0
+    def get_rotation_matrix(angle, axis='y'):
+        matrix = np.identity(4)
+        matrix[:3, :3] = Rotation.from_euler(axis, angle).as_dcm()
+        return matrix
 
 def get_camera_transform_looking_at_origin(rotation_y, rotation_x, camera_distance=2):
     camera_transform = np.identity(4)
