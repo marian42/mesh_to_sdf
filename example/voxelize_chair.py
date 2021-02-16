@@ -20,6 +20,6 @@ print("Voxelizing...")
 voxels = cloud.get_voxels(128, use_depth_buffer=True)
 
 print("Creating a mesh using Marching Cubes...")
-vertices, faces, normals, _ = skimage.measure.marching_cubes_lewiner(voxels, level=0)
+vertices, faces, normals, _ = skimage.measure.marching_cubes(voxels, level=0)
 mesh = trimesh.Trimesh(vertices=vertices, faces=faces, vertex_normals=normals)
 mesh.show()

@@ -29,7 +29,7 @@ mesh = trimesh.load('chair.obj')
 
 voxels = mesh_to_voxels(mesh, 64, pad=True)
 
-vertices, faces, normals, _ = skimage.measure.marching_cubes_lewiner(voxels, level=0)
+vertices, faces, normals, _ = skimage.measure.marching_cubes(voxels, level=0)
 mesh = trimesh.Trimesh(vertices=vertices, faces=faces, vertex_normals=normals)
 mesh.show()
 ```
