@@ -20,5 +20,10 @@ setuptools.setup(
     ],
     python_requires='>=3.5',
     data_files=[('shaders', ['mesh_to_sdf/shaders/mesh.frag', 'mesh_to_sdf/shaders/mesh.vert'])],
-    include_package_data = True
+    include_package_data = True,
+    install_requires=[
+        'pyopengl',
+        'pyrender',
+        'scikit-image'
+    ]
 )
