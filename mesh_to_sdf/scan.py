@@ -26,9 +26,9 @@ def get_camera_transform_looking_at_origin(rotation_y, rotation_x, camera_distan
 def get_camera_transform(position, look_direction):
     camera_forward = -look_direction / np.linalg.norm(look_direction)
     camera_right = np.cross(camera_forward, np.array((0, 0, -1)))
-    if np.linalg.norm(camera_right) < 0.5:
-        camera_right = np.array((0, 1, 0))
+    camera_right /= np.linalg.norm(camera_right)
     camera_up = np.cross(camera_forward, camera_right)
+    camera_up /= np.linalg.norm(camera_up)
 
     rotation = np.identity(4)
     rotation[:3, 0] = camera_right
