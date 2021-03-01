@@ -8,6 +8,7 @@ from sklearn.neighbors import KDTree
 import math
 import pyrender
 from mesh_to_sdf.utils import sample_uniform_points_in_unit_sphere
+from mesh_to_sdf.utils import get_raster_points, check_voxels
 
 class BadMeshException(Exception):
     pass
@@ -28,39 +29,61 @@ class SurfacePointCloud:
         else:
             return self.mesh.sample(count)
 
-    def get_sdf(self, query_points, use_depth_buffer=False, sample_count=11):
+    def get_sdf(self, query_points, use_depth_buffer=False, sample_count=11, return_gradients=False):
         if use_depth_buffer:
-            distances, _ = self.kd_tree.query(query_points)
-            distances = distances.astype(np.float32).reshape(-1) * -1
-            distances[self.is_outside(query_points)] *= -1
-            return distances
+            distances, indices = self.kd_tree.query(query_points)
+            distances = distances.astype(np.float32).reshape(-1)
+            inside = ~self.is_outside(query_points)
+            distances[inside] *= -1
+
+            if return_gradients:
+                gradients = query_points - self.points[indices[:, 0]]
+                gradients[inside] *= -1
+
         else:
             distances, indices = self.kd_tree.query(query_points, k=sample_count)
             distances = distances.astype(np.float32)
 
             closest_points = self.points[indices]
-            direction_to_surface = query_points[:, np.newaxis, :] - closest_points
-            inside = np.einsum('ijk,ijk->ij', direction_to_surface, self.normals[indices]) < 0
+            direction_from_surface = query_points[:, np.newaxis, :] - closest_points
+            inside = np.einsum('ijk,ijk->ij', direction_from_surface, self.normals[indices]) < 0
             inside = np.sum(inside, axis=1) > sample_count * 0.5
             distances = distances[:, 0]
             distances[inside] *= -1
+
+            if return_gradients:
+                gradients = direction_from_surface[:, 0]
+                gradients[inside] *= -1
+
+        if return_gradients:
+            near_surface = np.abs(distances) < math.sqrt(0.0025**2 * 3) * 3 # 3D 2-norm stdev * 3
+            gradients = np.where(near_surface[:, np.newaxis], self.normals[indices[:, 0]], gradients)
+            gradients /= np.linalg.norm(gradients, axis=1)[:, np.newaxis]
+            return distances, gradients
+        else:
             return distances
 
-    def get_sdf_in_batches(self, query_points, use_depth_buffer=False, sample_count=11, batch_size=1000000):
+    def get_sdf_in_batches(self, query_points, use_depth_buffer=False, sample_count=11, batch_size=1000000, return_gradients=False):
         if query_points.shape[0] <= batch_size:
-            return self.get_sdf(query_points, use_depth_buffer=use_depth_buffer, sample_count=sample_count)
-        
-        result = np.zeros(query_points.shape[0])
-        for i in range(int(math.ceil(query_points.shape[0] / batch_size))):
-            start = int(i * batch_size)
-            end = int(min(result.shape[0], (i + 1) * batch_size))
-            result[start:end] = self.get_sdf(query_points[start:end, :], use_depth_buffer=use_depth_buffer, sample_count=sample_count)
-        return result
+            return self.get_sdf(query_points, use_depth_buffer=use_depth_buffer, sample_count=sample_count, return_gradients=return_gradients)
 
-    def get_voxels(self, voxel_resolution, use_depth_buffer=False, sample_count=11, pad=False, check_result=False):
-        from mesh_to_sdf.utils import get_raster_points, check_voxels
-        
-        sdf = self.get_sdf_in_batches(get_raster_points(voxel_resolution), use_depth_buffer, sample_count)
+        n_batches = int(math.ceil(query_points.shape[0] / batch_size))
+        batches = [
+            self.get_sdf(points, use_depth_buffer=use_depth_buffer, sample_count=sample_count, return_gradients=return_gradients)
+            for points in np.array_split(query_points, n_batches)
+        ]
+        if return_gradients:
+            distances = np.concatenate([batch[0] for batch in batches])
+            gradients = np.concatenate([batch[1] for batch in batches])
+            return distances, gradients
+        else:
+            return np.concatenate(batches) # distances
+
+    def get_voxels(self, voxel_resolution, use_depth_buffer=False, sample_count=11, pad=False, check_result=False, return_gradients=False):
+        if return_gradients:
+            raise NotImplementedError # TODO: support this
+
+        sdf = self.get_sdf_in_batches(get_raster_points(voxel_resolution), use_depth_buffer, sample_count, return_gradients)
         voxels = sdf.reshape((voxel_resolution, voxel_resolution, voxel_resolution))
 
         if check_result and not check_voxels(voxels):
@@ -71,7 +94,7 @@ class SurfacePointCloud:
 
         return voxels
 
-    def sample_sdf_near_surface(self, number_of_points=500000, use_scans=True, sign_method='normal', normal_sample_count=11, min_size=0):
+    def sample_sdf_near_surface(self, number_of_points=500000, use_scans=True, sign_method='normal', normal_sample_count=11, min_size=0, return_gradients=False):
         query_points = []
         surface_sample_count = int(number_of_points * 47 / 50) // 2
         surface_points = self.get_random_surface_points(surface_sample_count, use_scans=use_scans)
@@ -84,18 +107,23 @@ class SurfacePointCloud:
         query_points = np.concatenate(query_points).astype(np.float32)
 
         if sign_method == 'normal':
-            sdf = self.get_sdf_in_batches(query_points, use_depth_buffer=False, sample_count=normal_sample_count)
+            sdf = self.get_sdf_in_batches(query_points, use_depth_buffer=False, sample_count=normal_sample_count, return_gradients=return_gradients)
         elif sign_method == 'depth':
-            sdf = self.get_sdf_in_batches(query_points, use_depth_buffer=True)
+            sdf = self.get_sdf_in_batches(query_points, use_depth_buffer=True, return_gradients=return_gradients)
         else:
             raise ValueError('Unknown sign determination method: {:s}'.format(sign_method))
-        
+        if return_gradients:
+            sdf, gradients = sdf
+
         if min_size > 0:
             model_size = np.count_nonzero(sdf[-unit_sphere_sample_count:] < 0) / unit_sphere_sample_count
             if model_size < min_size:
                 raise BadMeshException()
 
-        return query_points, sdf
+        if return_gradients:
+            return query_points, sdf, gradients
+        else:
+            return query_points, sdf
 
     def show(self):
         scene = pyrender.Scene()

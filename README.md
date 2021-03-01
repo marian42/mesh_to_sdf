@@ -232,3 +232,7 @@ Number of points to sample when using `surface_point_method='sample'`
 - `normal_sample_count`:
 Number of nearby surface points to check when using `sign_method='normal'`.
 The sign of the resulting SDF is determined by majority vote.
+
+- `return_gradients`
+Produce the gradient of the SDF along with the SDF itself. Changes the output from a
+`np.ndarray` to `(np.ndarray, np.ndarray)` of shapes `(N)` and `(N, 3)` respectively.
