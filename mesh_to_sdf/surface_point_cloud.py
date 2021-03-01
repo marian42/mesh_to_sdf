@@ -1,4 +1,6 @@
-from mesh_to_sdf.scan import Scan, get_camera_transform_looking_at_origin
+from .scan import Scan, get_camera_transform_looking_at_origin
+from .utils import sample_uniform_points_in_unit_sphere
+from .utils import get_raster_points, check_voxels
 
 import trimesh
 import logging
@@ -7,8 +9,6 @@ import numpy as np
 from sklearn.neighbors import KDTree
 import math
 import pyrender
-from mesh_to_sdf.utils import sample_uniform_points_in_unit_sphere
-from mesh_to_sdf.utils import get_raster_points, check_voxels
 
 class BadMeshException(Exception):
     pass
