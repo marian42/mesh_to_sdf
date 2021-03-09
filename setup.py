@@ -25,6 +25,6 @@ setuptools.setup(
         'pyopengl',
         'pyrender',
         'scikit-image',
-        'sklearn',
+        'scikit-learn',
     ]
 )
