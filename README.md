@@ -123,7 +123,7 @@ This checks if the difference in SDF is smaller than the difference in distance 
 In `sample_sdf_near_surface`, you can add a volume check (`min_size`).
 If these checks fail, a `BadMeshException` is thrown.
 
-This repository can process about 60% of the meshes in the [ShapeNet](https://www.shapenet.org/) dataset.
+This method can process about 60% of the meshes in the [ShapeNet](https://www.shapenet.org/) dataset.
 
 
 # Documentation
@@ -150,7 +150,7 @@ Calculate an N ✕ N ✕ N voxel volume of signed distance values for a given me
 The mesh is first transformed to fit inside a cube ranging from -1 to 1.
 
 ```python
-mesh_to_sdf.mesh_to_voxels(mesh, voxel_resolution=64, surface_point_method='scan', sign_method='normal', scan_count=100, scan_resolution=400, sample_point_count=10000000, normal_sample_count=11, pad=False, check_result=False)
+mesh_to_sdf.mesh_to_voxels(mesh, voxel_resolution=64, surface_point_method='scan', sign_method='normal', scan_count=100, scan_resolution=400, sample_point_count=10000000, normal_sample_count=11, pad=False, check_result=False, return_gradients=False)
 ```
 
 Parameters
@@ -162,7 +162,10 @@ If the voxel volume is not a plausible signed distance field, an exception is th
 - See *common parameters* for the remaining parameters
 
 Returns
-- a numpy array of shape N ✕ N ✕ N (or N + 2 ✕ N + 2 ✕ N + 2 when using padding)
+- a numpy array of shape (N, N, N) or (N + 2, N + 2, N + 2) when using padding
+
+Returns additionally if `return_gradients` is `True`:
+- gradients in a numpy array of shape (N, N, N, 3) or (N + 2, N + 2, N + 2, 3) when using padding
 
 ## sample_sdf_near_surface
 
@@ -171,7 +174,7 @@ This follows the procedure proposed in the [DeepSDF paper](https://arxiv.org/abs
 The mesh is first transformed to fit inside the unit sphere.
 
 ```python
-mesh_to_sdf.sample_sdf_near_surface(mesh, number_of_points = 500000, surface_point_method='scan', sign_method='normal', scan_count=100, scan_resolution=400, sample_point_count=10000000, normal_sample_count=11, min_size=0)
+mesh_to_sdf.sample_sdf_near_surface(mesh, number_of_points = 500000, surface_point_method='scan', sign_method='normal', scan_count=100, scan_resolution=400, sample_point_count=10000000, normal_sample_count=11, min_size=0, return_gradients=False)
 ```
 
 Parameters
@@ -183,8 +186,11 @@ This can be used to detect bad meshes.
 - See *common parameters* for the remaining parameters
 
 Returns
-- `points`: an N ✕ 3 numpy array containing the sample points
-- `sdf`: a numpy array of size N with the corresponding SDF values
+- an (N, 3) numpy array containing the sample points
+- a numpy array of size N with the corresponding SDF values
+
+Returns additionally if `return_gradients` is `True`:
+- an (N, 3) numpy array containing the gradients
 
 ## get_surface_point_cloud
 
@@ -232,7 +238,3 @@ Number of points to sample when using `surface_point_method='sample'`
 - `normal_sample_count`:
 Number of nearby surface points to check when using `sign_method='normal'`.
 The sign of the resulting SDF is determined by majority vote.
-
-- `return_gradients`
-Produce the gradient of the SDF along with the SDF itself. Changes the output from a
-`np.ndarray` to `(np.ndarray, np.ndarray)` of shapes `(N)` and `(N, 3)` respectively.

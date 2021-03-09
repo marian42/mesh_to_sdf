@@ -80,10 +80,13 @@ class SurfacePointCloud:
             return np.concatenate(batches) # distances
 
     def get_voxels(self, voxel_resolution, use_depth_buffer=False, sample_count=11, pad=False, check_result=False, return_gradients=False):
-        if return_gradients:
-            raise NotImplementedError # TODO: support this
-
-        sdf = self.get_sdf_in_batches(get_raster_points(voxel_resolution), use_depth_buffer, sample_count, return_gradients)
+        result = self.get_sdf_in_batches(get_raster_points(voxel_resolution), use_depth_buffer, sample_count, return_gradients=return_gradients)
+        if not return_gradients:
+            sdf = result
+        else:
+            sdf, gradients = result
+            voxel_gradients = np.reshape(gradients, (voxel_resolution, voxel_resolution, voxel_resolution, 3))
+        
         voxels = sdf.reshape((voxel_resolution, voxel_resolution, voxel_resolution))
 
         if check_result and not check_voxels(voxels):
@@ -92,7 +95,12 @@ class SurfacePointCloud:
         if pad:
             voxels = np.pad(voxels, 1, mode='constant', constant_values=1)
 
-        return voxels
+        if return_gradients:
+            if pad:
+                voxel_gradients = np.pad(voxel_gradients, ((1, 1), (1, 1), (1, 1), (0, 0)), mode='edge')
+            return voxels, voxel_gradients
+        else:
+            return voxels
 
     def sample_sdf_near_surface(self, number_of_points=500000, use_scans=True, sign_method='normal', normal_sample_count=11, min_size=0, return_gradients=False):
         query_points = []
