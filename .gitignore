@@ -4,3 +4,7 @@ mesh_to_sdf.egg-info/
 build/**
 dist/**
 test/
+
+*.obj
+*.stl
+*.ply
