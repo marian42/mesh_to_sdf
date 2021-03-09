@@ -94,10 +94,10 @@ class SurfacePointCloud:
 
         if pad:
             voxels = np.pad(voxels, 1, mode='constant', constant_values=1)
+            if return_gradients:
+                voxel_gradients = np.pad(voxel_gradients, ((1, 1), (1, 1), (1, 1), (0, 0)), mode='edge')
 
         if return_gradients:
-            if pad:
-                voxel_gradients = np.pad(voxel_gradients, ((1, 1), (1, 1), (1, 1), (0, 0)), mode='edge')
             return voxels, voxel_gradients
         else:
             return voxels
