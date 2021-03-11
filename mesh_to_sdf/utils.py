@@ -1,3 +1,4 @@
+import functools
 import trimesh
 import numpy as np
 
@@ -20,12 +21,9 @@ def scale_to_unit_cube(mesh):
 
     return trimesh.Trimesh(vertices=vertices, faces=mesh.faces)
 
-voxel_points = dict()
-
+# Use get_raster_points.cache_clear() to clear the cache
+@functools.lru_cache(maxsize=4)
 def get_raster_points(voxel_resolution):
-    if voxel_resolution in voxel_points:
-        return voxel_points[voxel_resolution]
-    
     points = np.meshgrid(
         np.linspace(-1, 1, voxel_resolution),
         np.linspace(-1, 1, voxel_resolution),
@@ -34,8 +32,6 @@ def get_raster_points(voxel_resolution):
     points = np.stack(points)
     points = np.swapaxes(points, 1, 2)
     points = points.reshape(3, -1).transpose().astype(np.float32)
-
-    voxel_points[voxel_resolution] = points
     return points
 
 def check_voxels(voxels):
