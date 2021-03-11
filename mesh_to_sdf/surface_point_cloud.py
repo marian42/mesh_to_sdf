@@ -1,4 +1,6 @@
-from mesh_to_sdf.scan import Scan, get_camera_transform_looking_at_origin
+from .scan import Scan, get_camera_transform_looking_at_origin
+from .utils import sample_uniform_points_in_unit_sphere
+from .utils import get_raster_points, check_voxels
 
 import trimesh
 import logging
@@ -7,8 +9,6 @@ import numpy as np
 from sklearn.neighbors import KDTree
 import math
 import pyrender
-from mesh_to_sdf.utils import sample_uniform_points_in_unit_sphere
-from mesh_to_sdf.utils import get_raster_points, check_voxels
 
 class BadMeshException(Exception):
     pass
@@ -94,10 +94,10 @@ class SurfacePointCloud:
 
         if pad:
             voxels = np.pad(voxels, 1, mode='constant', constant_values=1)
+            if return_gradients:
+                voxel_gradients = np.pad(voxel_gradients, ((1, 1), (1, 1), (1, 1), (0, 0)), mode='edge')
 
         if return_gradients:
-            if pad:
-                voxel_gradients = np.pad(voxel_gradients, ((1, 1), (1, 1), (1, 1), (0, 0)), mode='edge')
             return voxels, voxel_gradients
         else:
             return voxels

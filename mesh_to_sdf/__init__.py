@@ -1,7 +1,7 @@
 import numpy as np
-import mesh_to_sdf.surface_point_cloud
-from mesh_to_sdf.surface_point_cloud import BadMeshException
-from mesh_to_sdf.utils import scale_to_unit_cube, scale_to_unit_sphere, get_raster_points, check_voxels
+from . import surface_point_cloud
+from .surface_point_cloud import BadMeshException
+from .utils import scale_to_unit_cube, scale_to_unit_sphere, get_raster_points, check_voxels
 import trimesh
 
 def get_surface_point_cloud(mesh, surface_point_method='scan', bounding_radius=None, scan_count=100, scan_resolution=400, sample_point_count=10000000, calculate_normals=True):
