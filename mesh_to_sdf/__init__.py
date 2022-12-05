@@ -49,8 +49,8 @@ def mesh_to_voxels(mesh, voxel_resolution=64, surface_point_method='scan', sign_
     return surface_point_cloud.get_voxels(voxel_resolution, sign_method=='depth', normal_sample_count, pad, check_result, return_gradients)
 
 # Sample some uniform points and some normally distributed around the surface as proposed in the DeepSDF paper
-def sample_sdf_near_surface(mesh, number_of_points = 500000, surface_point_method='scan', sign_method='normal', scan_count=100, scan_resolution=400, sample_point_count=10000000, normal_sample_count=11, min_size=0, return_gradients=False):
-    mesh = scale_to_unit_sphere(mesh)
+def sample_sdf_near_surface(mesh, number_of_points = 500000, surface_point_method='scan', sign_method='normal', scan_count=100, scan_resolution=400, sample_point_count=10000000, normal_sample_count=11, min_size=0, return_gradients=False, fixed_scaling=False):
+    mesh = scale_to_unit_sphere(mesh, fixed_scaling)
     
     if surface_point_method == 'sample' and sign_method == 'depth':
         print("Incompatible methods for sampling points and determining sign, using sign_method='normal' instead.")
