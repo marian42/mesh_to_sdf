@@ -2,16 +2,16 @@ import functools
 import trimesh
 import numpy as np
 
-def scale_to_unit_sphere(mesh, fixed_scaling):
+def scale_to_unit_sphere(mesh, auto_scaling, scale_ratio):
     if isinstance(mesh, trimesh.Scene):
         mesh = mesh.dump().sum()
 
     vertices = mesh.vertices - mesh.bounding_box.centroid
-    if not fixed_scaling:
+    if auto_scaling:
         distances = np.linalg.norm(vertices, axis=1)
         vertices /= np.max(distances)
     else:
-        vertices /= 1.414   # this is the maximum possible ratio between the original and scaled mesh
+        vertices /= scale_ratio   # ratio between the original mesh and the scaled mesh inside the unit sphere
 
     return trimesh.Trimesh(vertices=vertices, faces=mesh.faces)
 
