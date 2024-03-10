@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mesh-to-sdf",
-    version="0.0.14",
+    version="0.0.15",
     author="Marian Kleineberg",
     author_email="mail@marian42.de",
     description="Calculate signed distance fields for arbitrary meshes",
