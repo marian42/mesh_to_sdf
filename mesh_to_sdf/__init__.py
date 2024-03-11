@@ -6,7 +6,7 @@ import trimesh
 
 def get_surface_point_cloud(mesh, surface_point_method='scan', bounding_radius=None, scan_count=100, scan_resolution=400, sample_point_count=10000000, calculate_normals=True):
     if isinstance(mesh, trimesh.Scene):
-        mesh = mesh.dump().sum()
+        mesh = mesh.dump(concatenate=True)
     if not isinstance(mesh, trimesh.Trimesh):
         raise TypeError("The mesh parameter must be a trimesh mesh.")
 
