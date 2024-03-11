@@ -174,7 +174,7 @@ This follows the procedure proposed in the [DeepSDF paper](https://arxiv.org/abs
 The mesh is first transformed to fit inside the unit sphere.
 
 ```python
-mesh_to_sdf.sample_sdf_near_surface(mesh, number_of_points = 500000, surface_point_method='scan', sign_method='normal', scan_count=100, scan_resolution=400, sample_point_count=10000000, normal_sample_count=11, min_size=0, return_gradients=False)
+mesh_to_sdf.sample_sdf_near_surface(mesh, number_of_points = 500000, surface_point_method='scan', sign_method='normal', scan_count=100, scan_resolution=400, sample_point_count=10000000, normal_sample_count=11, min_size=0, return_gradients=False, uniform_proportion=0.06, jitter=0.0025):
 ```
 
 Parameters
@@ -183,6 +183,8 @@ Parameters
 - `min_size`: The fraction of uniformly sampled that should be inside the shape.
 If this is 0.015 and less than 1.5% of uniformly sampled points have negative SDFs, an exception is thrown.
 This can be used to detect bad meshes.
+- `uniform_proportion`: The fraction of points that should be uniformly sampled vs near the surface boundary
+- `jitter`: The magnitude of jitter to apply to points sampled from the surface boundary
 - See *common parameters* for the remaining parameters
 
 Returns
