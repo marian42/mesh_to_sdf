@@ -34,9 +34,9 @@ def mesh_to_sdf(mesh, query_points, surface_point_method='scan', sign_method='no
     point_cloud = get_surface_point_cloud(mesh, surface_point_method, bounding_radius, scan_count, scan_resolution, sample_point_count, calculate_normals=sign_method=='normal')
 
     if sign_method == 'normal':
-        return point_cloud.get_sdf_in_batches(query_points, use_depth_buffer=False)
+        return point_cloud.get_sdf_in_batches(query_points, use_depth_buffer=False, sample_count=normal_sample_count)
     elif sign_method == 'depth':
-        return point_cloud.get_sdf_in_batches(query_points, use_depth_buffer=True, sample_count=sample_point_count)
+        return point_cloud.get_sdf_in_batches(query_points, use_depth_buffer=True, sample_count=normal_sample_count)
     else:
         raise ValueError('Unknown sign determination method: {:s}'.format(sign_method))
 
